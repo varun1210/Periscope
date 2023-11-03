@@ -1,7 +1,0 @@
-dnspython
-certifi
-pendulum
-requests
-matplotlib
-beautifulsoup4
-lxml
