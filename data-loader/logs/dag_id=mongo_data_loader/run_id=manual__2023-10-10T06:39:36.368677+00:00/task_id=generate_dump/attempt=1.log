@@ -1,0 +1,13 @@
+[2023-10-10T06:39:39.949+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mongo_data_loader.generate_dump manual__2023-10-10T06:39:36.368677+00:00 [queued]>
+[2023-10-10T06:39:39.954+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mongo_data_loader.generate_dump manual__2023-10-10T06:39:36.368677+00:00 [queued]>
+[2023-10-10T06:39:39.954+0000] {taskinstance.py:1359} INFO - Starting attempt 1 of 1
+[2023-10-10T06:39:39.960+0000] {taskinstance.py:1380} INFO - Executing <Task(_PythonDecoratedOperator): generate_dump> on 2023-10-10 06:39:36.368677+00:00
+[2023-10-10T06:39:39.964+0000] {standard_task_runner.py:57} INFO - Started process 81 to run task
+[2023-10-10T06:39:39.967+0000] {standard_task_runner.py:84} INFO - Running: ['***', 'tasks', 'run', 'mongo_data_loader', 'generate_dump', 'manual__2023-10-10T06:39:36.368677+00:00', '--job-id', '13', '--raw', '--subdir', 'DAGS_FOLDER/mongo_data_loader.py', '--cfg-path', '/tmp/tmp845_6ib4']
+[2023-10-10T06:39:39.969+0000] {standard_task_runner.py:85} INFO - Job 13: Subtask generate_dump
+[2023-10-10T06:39:39.993+0000] {task_command.py:415} INFO - Running <TaskInstance: mongo_data_loader.generate_dump manual__2023-10-10T06:39:36.368677+00:00 [running]> on host 4906b841ff2c
+[2023-10-10T06:39:40.031+0000] {taskinstance.py:1660} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='mongo_data_loader' AIRFLOW_CTX_TASK_ID='generate_dump' AIRFLOW_CTX_EXECUTION_DATE='2023-10-10T06:39:36.368677+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2023-10-10T06:39:36.368677+00:00'
+[2023-10-10T06:39:43.504+0000] {python.py:194} INFO - Done. Returned value was: None
+[2023-10-10T06:39:43.519+0000] {taskinstance.py:1398} INFO - Marking task as SUCCESS. dag_id=mongo_data_loader, task_id=generate_dump, execution_date=20231010T063936, start_date=20231010T063939, end_date=20231010T063943
+[2023-10-10T06:39:43.564+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 0
+[2023-10-10T06:39:43.584+0000] {taskinstance.py:2776} INFO - 1 downstream tasks scheduled from follow-on schedule check
