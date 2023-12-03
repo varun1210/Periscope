@@ -25,7 +25,7 @@ A brief description of the project components is provided below. I will try to u
 * [Docker](https://www.docker.com/)
 
 ### 1.3. Architecture
-![ALT Data Loader Architecture Image](https://github.com/varun1210/Periscope/blob/main/data-loader/data_loader.jpg](https://github.com/varun1210/Periscope/blob/main/data-loader/data_loader.jpeg)
+[!ALT Data Loader Architecture](https://github.com/varun1210/Periscope/blob/main/data-loader/data_loader.jpeg)
 * At its core, the data loader is a scheduled Apache Airflow data pipeline that migrates data from an API to a Collection in a MongoDB Atlas data store.
 * The data is fetched from the API, preprocessed, timestamped, and loaded to the database every month. The frequency of the update has been arbitrarily chosen.
 * The DAG for the pipeline has been represented above. Essentially, it is broken up into four stages. Each of these stages has been modularized into a separate Python script and triggered sequentially.
