@@ -1,0 +1,28 @@
+[2023-12-03T05:12:43.514+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mongo_data_loader.generate_dump scheduled__2023-04-10T16:45:00+00:00 [queued]>
+[2023-12-03T05:12:43.532+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mongo_data_loader.generate_dump scheduled__2023-04-10T16:45:00+00:00 [queued]>
+[2023-12-03T05:12:43.547+0000] {taskinstance.py:1359} INFO - Starting attempt 1 of 1
+[2023-12-03T05:12:43.593+0000] {taskinstance.py:1380} INFO - Executing <Task(_PythonDecoratedOperator): generate_dump> on 2023-04-10 16:45:00+00:00
+[2023-12-03T05:12:43.611+0000] {standard_task_runner.py:57} INFO - Started process 126 to run task
+[2023-12-03T05:12:43.633+0000] {standard_task_runner.py:84} INFO - Running: ['***', 'tasks', 'run', 'mongo_data_loader', 'generate_dump', 'scheduled__2023-04-10T16:45:00+00:00', '--job-id', '24', '--raw', '--subdir', 'DAGS_FOLDER/mongo_data_loader.py', '--cfg-path', '/tmp/tmpvl5nkrk1']
+[2023-12-03T05:12:43.656+0000] {standard_task_runner.py:85} INFO - Job 24: Subtask generate_dump
+[2023-12-03T05:12:43.785+0000] {task_command.py:415} INFO - Running <TaskInstance: mongo_data_loader.generate_dump scheduled__2023-04-10T16:45:00+00:00 [running]> on host 0dd9b00a73f6
+[2023-12-03T05:12:43.881+0000] {taskinstance.py:1660} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='mongo_data_loader' AIRFLOW_CTX_TASK_ID='generate_dump' AIRFLOW_CTX_EXECUTION_DATE='2023-04-10T16:45:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2023-04-10T16:45:00+00:00'
+[2023-12-03T05:12:44.003+0000] {taskinstance.py:1935} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/decorators/base.py", line 221, in execute
+    return_value = super().execute(context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 192, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 209, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/mongo_data_loader.py", line 32, in generate_dump
+    generate_raw_dump.generate_job_dump()
+  File "/opt/airflow/dags/generate_raw_dump.py", line 63, in generate_job_dump
+    job_ids = find_job_ids(search_params['job_title'], search_params['job_location'])
+  File "/opt/airflow/dags/generate_raw_dump.py", line 22, in find_job_ids
+    job_postings = response.json()['data']
+KeyError: 'data'
+[2023-12-03T05:12:44.025+0000] {taskinstance.py:1398} INFO - Marking task as FAILED. dag_id=mongo_data_loader, task_id=generate_dump, execution_date=20230410T164500, start_date=20231203T051243, end_date=20231203T051244
+[2023-12-03T05:12:44.038+0000] {standard_task_runner.py:104} ERROR - Failed to execute job 24 for task generate_dump ('data'; 126)
+[2023-12-03T05:12:44.075+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 1
+[2023-12-03T05:12:44.101+0000] {taskinstance.py:2776} INFO - 0 downstream tasks scheduled from follow-on schedule check

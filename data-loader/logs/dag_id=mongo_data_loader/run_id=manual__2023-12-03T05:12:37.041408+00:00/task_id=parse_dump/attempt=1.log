@@ -1,0 +1,26 @@
+[2023-12-03T05:15:00.405+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mongo_data_loader.parse_dump manual__2023-12-03T05:12:37.041408+00:00 [queued]>
+[2023-12-03T05:15:00.410+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mongo_data_loader.parse_dump manual__2023-12-03T05:12:37.041408+00:00 [queued]>
+[2023-12-03T05:15:00.410+0000] {taskinstance.py:1359} INFO - Starting attempt 1 of 1
+[2023-12-03T05:15:00.417+0000] {taskinstance.py:1380} INFO - Executing <Task(_PythonDecoratedOperator): parse_dump> on 2023-12-03 05:12:37.041408+00:00
+[2023-12-03T05:15:00.422+0000] {standard_task_runner.py:57} INFO - Started process 168 to run task
+[2023-12-03T05:15:00.426+0000] {standard_task_runner.py:84} INFO - Running: ['***', 'tasks', 'run', 'mongo_data_loader', 'parse_dump', 'manual__2023-12-03T05:12:37.041408+00:00', '--job-id', '31', '--raw', '--subdir', 'DAGS_FOLDER/mongo_data_loader.py', '--cfg-path', '/tmp/tmpmafb2nyz']
+[2023-12-03T05:15:00.430+0000] {standard_task_runner.py:85} INFO - Job 31: Subtask parse_dump
+[2023-12-03T05:15:00.463+0000] {task_command.py:415} INFO - Running <TaskInstance: mongo_data_loader.parse_dump manual__2023-12-03T05:12:37.041408+00:00 [running]> on host 0dd9b00a73f6
+[2023-12-03T05:15:00.515+0000] {taskinstance.py:1660} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='mongo_data_loader' AIRFLOW_CTX_TASK_ID='parse_dump' AIRFLOW_CTX_EXECUTION_DATE='2023-12-03T05:12:37.041408+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2023-12-03T05:12:37.041408+00:00'
+[2023-12-03T05:15:00.518+0000] {taskinstance.py:1935} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/decorators/base.py", line 221, in execute
+    return_value = super().execute(context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 192, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 209, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/mongo_data_loader.py", line 38, in parse_dump
+    parse_raw_dump.process_raw_dump()
+  File "/opt/airflow/dags/parse_raw_dump.py", line 12, in process_raw_dump
+    with open('{raw_file_path}raw_dump_{current_date}.json'.format(raw_file_path=RAW_FILE_BASE_PATH, current_date=datetime.now().strftime("%d_%m_%Y")), 'r') as file:
+FileNotFoundError: [Errno 2] No such file or directory: '/opt/airflow/dags/raw-dump/raw_dump_03_12_2023.json'
+[2023-12-03T05:15:00.523+0000] {taskinstance.py:1398} INFO - Marking task as FAILED. dag_id=mongo_data_loader, task_id=parse_dump, execution_date=20231203T051237, start_date=20231203T051500, end_date=20231203T051500
+[2023-12-03T05:15:00.529+0000] {standard_task_runner.py:104} ERROR - Failed to execute job 31 for task parse_dump ([Errno 2] No such file or directory: '/opt/airflow/dags/raw-dump/raw_dump_03_12_2023.json'; 168)
+[2023-12-03T05:15:00.562+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 1
+[2023-12-03T05:15:00.577+0000] {taskinstance.py:2776} INFO - 0 downstream tasks scheduled from follow-on schedule check
