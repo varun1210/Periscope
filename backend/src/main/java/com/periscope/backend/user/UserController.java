@@ -41,7 +41,7 @@ public class UserController {
         }
     }
 
-    @PostMapping(value = "/create-user", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/create", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity createUser(@RequestParam User userInfo, @RequestPart List<MultipartFile> resumes) {
         try {
             System.out.println(userInfo);
