@@ -7,11 +7,15 @@ Periscope is a project that has been broken up into three major components (or s
 A brief description of the project components is provided below. I will try to update the documentation with every major commit, but it is possible that the documentation may not be up to date with the minute features that I incrementally add.
 
 
+---- PROJECT CURRENTLY UNDERGOING MAJOR UPDATE PLEASE IGNORE README BEYOND THIS POINT. ACCURATE README WILL BE AVAILABLE UPON RELEASE 1.0.1 ----
+
+
 
 
 # Components
 
-## 1. Data Loader
+---- (DEFUNCT - JUL 7, 2025) -----
+## 1. Data Loader 
 
 ### 1.1. Overview
 * Two kinds of data are currently used to power the backend - jobs data obtained from the LinkedIn job board, and user data that drives the functionality for the users. This component focuses on collecting and publishing the job data by extracting it from the job board.
@@ -29,5 +33,7 @@ A brief description of the project components is provided below. I will try to u
 * At its core, the data loader is a scheduled Apache Airflow data pipeline that migrates data from an API to a Collection in a MongoDB Atlas data store.
 * The data is fetched from the API, preprocessed, timestamped, and loaded to the database every month. The frequency of the update has been arbitrarily chosen.
 * The DAG for the pipeline has been represented above. Essentially, it is broken up into four stages. Each of these stages has been modularized into a separate Python script and triggered sequentially.
+
+---- (END - JUL 7, 2025) -----
 
 
