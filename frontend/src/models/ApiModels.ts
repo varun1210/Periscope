@@ -1,5 +1,3 @@
-import type JobSummary from './Job';
-
 export interface ApiResponse<T> {
   success: boolean;
   data: T | null;
@@ -38,6 +36,21 @@ export interface UserUpdateRequest {
     file: File | null
 }
 
-export interface AppliedJobsResponse {
-    appliedJobs: JobSummary[]
+interface JobSummaryResponse {
+    job_id: number,
+    company: string, 
+    title: string,
+    location: string,
+    median_pay: number | null,
+    min_pay: number | null,
+    max_pay: number | null,
+    link: string
+}
+
+export interface JobSearchResponse {
+    jobs: JobSummaryResponse[],
+    total: number,
+    page: number,
+    limit: number, 
+    total_pages: number
 }

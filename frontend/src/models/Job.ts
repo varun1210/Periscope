@@ -1,25 +1,25 @@
-export default interface Job {
+export interface Job {
   jobId: string,
   company: string,
   title: string,
   location: string,
   jobDescription: string,
-  medianPay: number,
-  minPay: number,
-  maxPay: number,
-  age: number,
+  medianPay: number | null,
+  minPay: number | null,
+  maxPay: number | null,
+  age: number | null,
   industry: string, 
-  experience: string,
+  experience: string | null,
   link: string,
 }
 
-export default interface JobSummary {
+export interface JobSummary {
   jobId: string, 
   company: string, 
   title: string, 
   location: string, 
-  medianPay: number,
-  minPay: number, 
-  maxPay: number, 
+  medianPay: number | null,
+  minPay: number | null, 
+  maxPay: number | null, 
   link: string
 }

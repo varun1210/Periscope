@@ -5,7 +5,7 @@ import axios from "axios";
 import Searchbar from "../components/Searchbar";
 import MultiSelectFilter from "../components/MultiSelectFilter";
 
-import type Job from "../models/Job";
+import type { Job } from "../models/Job";
 import JobCard from "../components/JobCard";
 import JobPost from "../components/JobPost";
 import { AuthContext, UserContext } from "../utils/contexts";
@@ -22,8 +22,8 @@ export interface Filters {
 export default function JobsPage() {
   const authState = useContext(AuthContext);
   const { user } = useContext(UserContext);
-  // const [jobSearchResults, setJobSearchResults] = useState<Job[]>([]);
-  const [jobSearchResults, setJobSearchResults] = useState<Job[]>(jobs);
+  const [jobSearchResults, setJobSearchResults] = useState<Job[]>([]);
+  // const [jobSearchResults, setJobSearchResults] = useState<Job[]>(jobs);
   const [searchStartIndex, setSearchStartIndex] = useState(0);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [showJobDetails, setShowJobDetails] = useState(false);

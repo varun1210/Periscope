@@ -5,12 +5,14 @@ import { GITHUB_AUTH_URL, API_BASE_URL, AUTH_API_BASE_URL } from "./env";
 
 import type {
   ApiResponse,
-  AppliedJobsResponse,
+  JobSearchResponse,
   BackendAuthResponse,
   ErrorResponse,
   UserProfileResponse,
   UserUpdateRequest,
 } from "./models/ApiModels";
+
+import type { JobSummary } from "./models/Job";
 
 let currentAccessToken: string | null = null;
 
@@ -154,7 +156,7 @@ export const interactionsAPI = {
   getAppliedJobs: async (
     page: number,
     limit: number
-  ): Promise<ApiResponse<AppliedJobsResponse>> => {
+  ): Promise<ApiResponse<JobSummary[]>> => {
     try {
       const response = await api.get("interactions/applied", {
         params: {
@@ -162,7 +164,19 @@ export const interactionsAPI = {
           limit: limit,
         },
       });
-      const appliedJobs: AppliedJobsResponse = response.data;
+      const appliedJobsResponse: JobSearchResponse = response.data;
+      const appliedJobs: JobSummary[] = appliedJobsResponse.jobs.map((job) => {
+        return {
+          jobId: job.job_id.toString(),
+          company: job.company,
+          title: job.title,
+          location: job.location,
+          medianPay: job.median_pay,
+          minPay: job.min_pay,
+          maxPay: job.max_pay,
+          link: job.link,
+        };
+      });
       return { success: true, data: appliedJobs, error: null };
     } catch (error: any) {
       const errorResponse: ErrorResponse = error.response.data;
