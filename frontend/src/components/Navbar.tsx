@@ -19,11 +19,11 @@ export default function Navbar() {
   const [profileDropdownActive, setProfileDropdownActive] = useState(false);
 
   const baseLinkClasses =
-    "text-white text-xl flex flex-row items-center transition-all duration-300 hover:text-green-100 hover:bg-green-600 hover:bg-opacity-30 px-3 py-2 rounded-lg font-medium";
+    "text-white text-lg flex flex-row items-center transition-all duration-300 hover:text-green-100 hover:bg-green-600 hover:bg-opacity-30 px-2.5 py-2 rounded-lg font-medium";
   const activeLinkClasses =
     "font-bold text-green-100 bg-green-800 bg-opacity-80 shadow-lg";
   const dropdownButtonClasses =
-    "text-white text-xl flex flex-row items-center transition-all duration-300 hover:text-green-100 hover:bg-green-600 hover:bg-opacity-30 px-3 py-2 rounded-lg font-medium";
+    "text-white text-lg flex flex-row items-center transition-all duration-300 hover:text-green-100 hover:bg-green-600 hover:bg-opacity-30 px-2.5 py-2 rounded-lg font-medium";
 
   const toggleDropdown = () => {
     setProfileDropdownActive((currentValue) => !currentValue);
@@ -56,24 +56,24 @@ export default function Navbar() {
   if (!user) return <div>Loading Navbar...</div>;
 
   return (
-    <nav className="bg-green-700 bg-gradient-to-l p-4">
+    <nav className="bg-green-700 bg-gradient-to-l p-3">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
         <div>
           <Link
             to="/home"
-            className="text-white text-2xl flex flex-row items-center"
+            className="text-white text-xl flex flex-row items-center"
           >
             PERISCOPE
           </Link>
         </div>
-        <div className="flex space-x-8 items-center">
+        <div className="flex space-x-6 items-center">
           <NavLink
             to="/home"
             className={({ isActive }) =>
               `${baseLinkClasses} ${isActive ? activeLinkClasses : ""}`
             }
           >
-            <FaHouse className="mr-1.5" />
+            <FaHouse className="mr-1 text-sm" />
             Home
           </NavLink>
           <NavLink
@@ -82,14 +82,14 @@ export default function Navbar() {
               `${baseLinkClasses} ${isActive ? activeLinkClasses : ""}`
             }
           >
-            <FaLaptop className="mr-1.5" />
+            <FaLaptop className="mr-1 text-sm" />
             Jobs
           </NavLink>
 
           {/* Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button onClick={toggleDropdown} className={dropdownButtonClasses}>
-              <IoPerson className="mr-1.5" />
+              <IoPerson className="mr-1 text-sm" />
               {user?.name}
             </button>
 

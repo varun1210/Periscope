@@ -26,10 +26,7 @@ export default function HomePage() {
         );
         if (appliedJobs.success && appliedJobs.data) {
           setAppliedJobs(appliedJobs.data || []);
-          if (
-            !appliedJobs.data ||
-            appliedJobs.data.length === 0
-          ) {
+          if (!appliedJobs.data || appliedJobs.data.length === 0) {
             setEmptyListMessage("You haven't applied to any jobs yet.");
           }
         } else {
@@ -86,7 +83,7 @@ export default function HomePage() {
         {/* Search Section */}
         <div className="flex flex-row justify-center items-center mb-12 sm:mb-14 lg:mb-16 w-full max-w-2xl">
           <div className="w-full border-2 border-gray-200 rounded-xl p-4 sm:p-6">
-            <Searchbar />
+            <Searchbar updateSearchTerm={() => {}}/>
           </div>
         </div>
 

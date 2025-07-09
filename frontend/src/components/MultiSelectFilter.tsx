@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 
-type FilterType = {type: 'DYNAMIC'} | {type: 'STATIC', filterOptions: string[]}
+import { jobsAPI } from "../api";
+
+type FilterType =
+  | { type: "DYNAMIC" }
+  | { type: "STATIC"; filterOptions: string[] };
 
 interface FilterProps {
-  filterName: string,
-  filterType: FilterType,
-  applyFilter: (filterName: string, filterValues: string[]) => void
+  filterName: string;
+  filterType: FilterType;
+  applyFilter: (filterName: string, filterValues: string[]) => void;
 }
 
 export default function MultiSelectFilter({
@@ -27,17 +30,33 @@ export default function MultiSelectFilter({
   };
 
   useEffect(() => {
-    if(filterType.type === 'STATIC') { setFilterOptions(filterType.filterOptions) }
-  }, [])
+    if (filterType.type === "STATIC") {
+      setFilterOptions(filterType.filterOptions);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchFilterOptionsFromBackend = async (input: string) => {
-      if(!input) return; 
-      // const response = await axios.get(`https://abc.com/response?query=${input}`);
-      console.log(input);
-      // setFilterOptions(response.data);
+      if (!input) return;
+      if (filterName !== "Industry" && filterName !== "Location") {
+        return;
+      }
+      try {
+        const response = await jobsAPI.getBackendQuery(filterName, input);
+        if (response.success && response.data) {
+          setFilterOptions(response.data.results);
+        } else {
+          console.log("No filter options for this query");
+        }
+      } catch (error) {
+        console.error("Error fetching filter options:", error);
+        setFilterOptions([]);
+      }
     };
-    const timeoutId = setTimeout(() => fetchFilterOptionsFromBackend(filterText), 300);
+    const timeoutId = setTimeout(
+      () => fetchFilterOptionsFromBackend(filterText),
+      300
+    );
     return () => clearTimeout(timeoutId);
   }, [filterText]);
 
@@ -99,38 +118,58 @@ export default function MultiSelectFilter({
       </button>
 
       {filterOpen && (
-        <div className="absolute top-full left-0 w-full bg-white border border-green-800 rounded-2xl mt-1 p-3 shadow-lg z-10">
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-64 bg-white border border-green-800 rounded-2xl mt-1 p-4 shadow-lg z-10">
           {filterType.type === "DYNAMIC" && (
-            <div>
+            <div className="mb-3">
               <input
                 type="text"
-                className="w-full px-3 py-0.5 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 mb-3"
-                placeholder={`${filterName}`}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 text-sm"
+                placeholder={`Search ${filterName.toLowerCase()}...`}
                 onChange={(e) => handleFilterSearchInput(e.target.value)}
               />
             </div>
           )}
-          {filterOptions.map((filterOption) => {
-            return (
-              <div key={filterOption} className="flex items-center gap-2 p-1">
-                <input
-                  type="checkbox"
-                  value={filterOption}
-                  id={filterOption}
-                  checked={filterValues.includes(filterOption)}
-                  onChange={(e) => updateFilterValues(e.target.value)}
-                  className="accent-green-700"
-                />
-                <label htmlFor={filterOption}>{filterOption}</label>
+
+          <div className="max-h-48 overflow-y-auto">
+            {filterOptions.length === 0 ? (
+              <div className="text-gray-500 text-sm py-2 text-center">
+                {filterType.type === "DYNAMIC" && filterText
+                  ? "No results found"
+                  : "Start typing to search..."}
               </div>
-            );
-          })}
-          <button
-            className="border border-green-800 text-white font-bold bg-green-700 rounded-full px-3 py-1 mt-2 w-full hover: cursor-pointer"
-            onClick={() => handleApplyButton()}
-          >
-            Apply
-          </button>
+            ) : (
+              filterOptions.map((filterOption) => (
+                <div
+                  key={filterOption}
+                  className="flex items-start gap-2 p-2 hover:bg-gray-50 rounded-lg"
+                >
+                  <input
+                    type="checkbox"
+                    value={filterOption}
+                    id={filterOption}
+                    checked={filterValues.includes(filterOption)}
+                    onChange={(e) => updateFilterValues(e.target.value)}
+                    className="accent-green-700 mt-0.5 flex-shrink-0"
+                  />
+                  <label
+                    htmlFor={filterOption}
+                    className="text-sm text-gray-700 cursor-pointer leading-relaxed flex-1"
+                  >
+                    {filterOption}
+                  </label>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <button
+              className="border border-green-800 text-white font-medium bg-green-700 hover:bg-green-800 rounded-lg px-3 py-1.5 w-full transition-colors duration-200 text-xs"
+              onClick={() => handleApplyButton()}
+            >
+              Apply {filterValues.length > 0 && `(${filterValues.length})`}
+            </button>
+          </div>
         </div>
       )}
     </div>

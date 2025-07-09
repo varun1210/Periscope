@@ -1,4 +1,4 @@
-import type Job from "../models/Job";
+import type { Job } from "../models/Job";
 import axios from "axios";
 
 export default function JobPost(job: Job) {
@@ -14,7 +14,7 @@ export default function JobPost(job: Job) {
       <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-200">
         <span className="text-gray-700 font-medium">{job.location}</span>
         <span className="text-green-600 font-semibold text-lg">
-          ${job.minPay.toLocaleString()} - ${job.maxPay.toLocaleString()}
+          {job.minPay && job.maxPay ? `\$${job.minPay.toLocaleString()} - \$${job.maxPay.toLocaleString()}` : "Pay not disclosed"}
         </span>
       </div>
 

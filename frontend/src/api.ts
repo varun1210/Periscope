@@ -10,9 +10,14 @@ import type {
   ErrorResponse,
   UserProfileResponse,
   UserUpdateRequest,
+  QueryType,
+  QueryResponse,
+  FiltersRequest,
+  JobResponse,
 } from "./models/ApiModels";
 
 import type { JobSummary } from "./models/Job";
+import type { Filters } from "./pages/JobsPage";
 
 let currentAccessToken: string | null = null;
 
@@ -167,7 +172,7 @@ export const interactionsAPI = {
       const appliedJobsResponse: JobSearchResponse = response.data;
       const appliedJobs: JobSummary[] = appliedJobsResponse.jobs.map((job) => {
         return {
-          jobId: job.job_id.toString(),
+          jobId: job.job_id,
           company: job.company,
           title: job.title,
           location: job.location,
@@ -187,33 +192,66 @@ export const interactionsAPI = {
 
 // Jobs API calls
 export const jobsAPI = {
-  searchJobs: async (filters: any, startIndex: number) => {
+  getBackendQuery: async (
+    type: QueryType,
+    query_string: string
+  ): Promise<ApiResponse<QueryResponse>> => {
     try {
-      const response = await api.get("jobs/search/", {
-        params: { ...filters, start: startIndex },
+      const response = await api.get("jobs/query", {
+        params: { type: type, query_string: query_string },
       });
-      return { STATUS_CODE: response.status, DATA: response.data };
+      const queryResponse: QueryResponse = response.data;
+      return { success: true, data: queryResponse, error: null };
     } catch (error: any) {
-      return {
-        STATUS_CODE: error.response?.status || 500,
-        DATA: error.response?.data || "Failed to search jobs",
-      };
+      const errorResponse: ErrorResponse = error.response.data;
+      return { success: false, data: null, error: errorResponse };
     }
   },
 
-  getDynamicFilterOptions: async (filterType: string, query: string) => {
+  searchJobs: async (
+    query_string: string,
+    filters: Filters = {},
+    page: number = 1,
+    limit: number = 10
+  ): Promise<ApiResponse<JobSearchResponse>> => {
     try {
-      const response = await api.get("jobs/filters/", {
-        params: { type: filterType, q: query },
-      });
-      return { STATUS_CODE: response.status, DATA: response.data };
-    } catch (error: any) {
-      return {
-        STATUS_CODE: error.response?.status || 500,
-        DATA: error.response?.data || "Failed to get filter options",
+      console.log(filters)
+      const requestFilters: FiltersRequest = {
+        industry: filters.industryFilter?.length
+          ? filters.industryFilter
+          : null,
+        experience: filters.experienceFilter?.length
+          ? filters.experienceFilter
+          : null,
+        location: filters.locationFilter?.length
+          ? filters.locationFilter
+          : null,
+        resume: filters.resumeFilter || null,
       };
+      const response = await api.post("jobs/search/", {
+        query_string,
+        filters: requestFilters,
+        page,
+        limit,
+      });
+      const searchResponse: JobSearchResponse = response.data;
+      return { success: true, data: searchResponse, error: null };
+    } catch (error: any) {
+      const errorResponse: ErrorResponse = error.response.data;
+      return { success: false, data: null, error: errorResponse };
     }
   },
+
+  getFullJobDetails: async (jobId: number) => {
+    try {
+      const response = await api.get(`jobs/${jobId}`);
+      const jobDetails: JobResponse = response.data;
+      return { success: true, data: jobDetails, error: null };
+    } catch (error: any) {
+      const errorResponse: ErrorResponse = error.response.data;
+      return { success: false, data: null, error: errorResponse };
+    }
+  }
 };
 
 export default api;

@@ -2,7 +2,15 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 from decimal import Decimal
+from enum import Enum
 
+class QueryType(Enum):
+    title = "Title"
+    location = "Location"
+    industry = "Industry"
+
+class QueryResponse(BaseModel):
+    results: Optional[List[str]] = None
 
 class JobBase(BaseModel):
     job_id: int
@@ -18,7 +26,6 @@ class JobBase(BaseModel):
     experience: Optional[str] = None
     link: Optional[str] = None
 
-
 class JobSummary(BaseModel):
     job_id: int
     company: str
@@ -29,22 +36,33 @@ class JobSummary(BaseModel):
     max_pay: Optional[Decimal] = None
     link: Optional[str] = None
 
-
-class JobSearchParams(BaseModel):
-    text: Optional[str] = None
-    industry: Optional[List[str]] = None
-    experience: Optional[List[str]] = None
-    location: Optional[List[str]] = None
-    page: int = 1
-    limit: int = 20
-
-
 class JobSummaryResponse(JobSummary):
     """Lightweight job info for search results"""
     # posted_date: datetime
 
     class Config:
         from_attributes = True
+
+class JobSearchFilters(BaseModel):
+    industry: Optional[List[str]] = None
+    experience: Optional[List[str]] = None
+    location: Optional[List[str]] = None
+    resume: Optional[str] = None
+
+class JobSearchRequest(BaseModel):
+    query_string: Optional[str]
+    filters: Optional[JobSearchFilters] = None
+    page: int = 1
+    limit: int = 20
+
+# class JobSearchParams(BaseModel):
+#     text: Optional[str] = None
+#     industry: Optional[List[str]] = None
+#     experience: Optional[List[str]] = None
+#     location: Optional[List[str]] = None
+#     resume: Optional[str] = None
+#     page: int = 1
+#     limit: int = 20
 
 
 class JobResponse(JobBase):

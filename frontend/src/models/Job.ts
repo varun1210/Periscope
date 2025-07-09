@@ -1,5 +1,5 @@
 export interface Job {
-  jobId: string,
+  jobId: number,
   company: string,
   title: string,
   location: string,
@@ -7,19 +7,18 @@ export interface Job {
   medianPay: number | null,
   minPay: number | null,
   maxPay: number | null,
-  age: number | null,
-  industry: string, 
+  industry: string | null, 
   experience: string | null,
-  link: string,
+  link: string | null,
 }
 
 export interface JobSummary {
-  jobId: string, 
+  jobId: number, 
   company: string, 
   title: string, 
   location: string, 
   medianPay: number | null,
   minPay: number | null, 
   maxPay: number | null, 
-  link: string
+  link: string | null
 }
