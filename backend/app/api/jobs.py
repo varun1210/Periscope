@@ -128,7 +128,7 @@ async def search_jobs(
         jobs = query.order_by(Job.posted_date.desc()).offset((page - 1) * limit).limit(limit).all()
         # Calculate pagination info
         total_pages = math.ceil(total / limit)
-
+        
         return JobSearchResponse(
             jobs=jobs,
             total=total,
@@ -138,6 +138,7 @@ async def search_jobs(
         )
     
     except ValueError as ve:
+        print(f"ValueError: {ve}")
         raise StandardHTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             message=str(ve),

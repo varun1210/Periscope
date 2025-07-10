@@ -3,7 +3,7 @@ import { createContext } from "react";
 import type AuthState from "../models/AuthState";
 import type { AuthAction } from "../models/AuthAction";
 import type UserContextType from "../models/UserContextType";
-
+import type { SearchContextType } from "../models/SearchContext";
 
 export const AuthContext = createContext<AuthState>({
   loggedIn: false,
@@ -17,4 +17,17 @@ export const AuthDispatchContext = createContext<(action: AuthAction) => void>(
   }
 );
 
-export const UserContext = createContext<UserContextType>({ user: null, updateFunction: () => {} });
+export const UserContext = createContext<UserContextType>({
+  user: null,
+  updateFunction: () => {},
+});
+
+export const SearchContext = createContext<SearchContextType>({
+  searchQuery: null,
+  filters: null,
+  results: null,
+  totalResults: null,
+  updateSearchContext: () => {
+    throw new Error("SearchContext must be used within SearchProvider");
+  },
+});

@@ -30,7 +30,7 @@ class JobSummary(BaseModel):
     job_id: int
     company: str
     title: str 
-    location: str 
+    location: Optional[str] = None 
     median_pay: Optional[Decimal] = None
     min_pay: Optional[Decimal] = None
     max_pay: Optional[Decimal] = None

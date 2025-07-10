@@ -23,6 +23,7 @@
 /frontend/README.md
 
 /backend/test.py
+/backend/backend_schema.sql
 /backend/**/__pycache__/
 /backend/bin/
 /backend/venv/

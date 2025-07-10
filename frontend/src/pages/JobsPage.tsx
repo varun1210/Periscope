@@ -11,7 +11,7 @@ import JobCard from "../components/JobCard";
 import JobPost from "../components/JobPost";
 import { UserContext } from "../utils/contexts";
 
-export interface Filters {
+export type Filters = {
   locationFilter?: string[],
   experienceFilter?: string[],
   industryFilter?: string[],

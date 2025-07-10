@@ -89,6 +89,7 @@ export default function MultiSelectFilter({
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setFilterOpen(false);
+        setFilterValues([]);
       }
     };
 

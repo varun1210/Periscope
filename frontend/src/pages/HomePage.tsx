@@ -1,15 +1,16 @@
 import { useState, useEffect, useContext } from "react";
 
-import { interactionsAPI } from "../api";
+import { interactionsAPI, jobsAPI } from "../api";
 
 import Searchbar from "../components/Searchbar";
 import JobTile from "../components/JobTile";
 
 import type { JobSummary } from "../models/Job";
-import { UserContext } from "../utils/contexts";
+import { SearchContext, UserContext } from "../utils/contexts";
 
 export default function HomePage() {
   const { user } = useContext(UserContext);
+  const searchContext = useContext(SearchContext);
   const [appliedJobs, setAppliedJobs] = useState<JobSummary[]>([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [loadMoreButtonDisabled, setLoadMoreButtonDisabled] = useState(false);
@@ -46,6 +47,11 @@ export default function HomePage() {
     };
     fetchPreviousJobs();
   }, [user]);
+
+  const performSearch = async () => {
+
+
+  }
 
   const handleLoadMore = async () => {
     try {

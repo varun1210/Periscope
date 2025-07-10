@@ -48,7 +48,17 @@ export default function JobPost(job: Job) {
         <h3 className="text-lg font-semibold text-gray-900 mb-3">
           Job Description
         </h3>
-        <p className="text-gray-700 leading-relaxed">{job.jobDescription}</p>
+        {/* <p className="text-gray-700 leading-relaxed">{job.jobDescription}</p> */}
+        {job.jobDescription ? (
+          <div
+            className="text-gray-700 leading-relaxed job-description"
+            dangerouslySetInnerHTML={{ __html: job.jobDescription }}
+          />
+        ) : (
+          <p className="text-gray-700 leading-relaxed italic">
+            No description available
+          </p>
+        )}
       </div>
     </div>
   );
