@@ -1,12 +1,15 @@
 import { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { interactionsAPI, jobsAPI } from "../api";
+import { interactionsAPI } from "../api";
 
 import Searchbar from "../components/Searchbar";
 import JobTile from "../components/JobTile";
 
 import type { JobSummary } from "../models/Job";
 import { SearchContext, UserContext } from "../utils/contexts";
+
+import performQuickSearch from "../utils/UtilFunctions";
 
 export default function HomePage() {
   const { user } = useContext(UserContext);
@@ -15,6 +18,7 @@ export default function HomePage() {
   const [pageNumber, setPageNumber] = useState(1);
   const [loadMoreButtonDisabled, setLoadMoreButtonDisabled] = useState(false);
   const [hasMoreAppliedJobs, setHasMoreAppliedJobs] = useState(true);
+  const navigate = useNavigate();
   const [emptyListMessage, setEmptyListMessage] = useState("Loading...");
 
   useEffect(() => {
@@ -22,7 +26,7 @@ export default function HomePage() {
     const fetchPreviousJobs = async () => {
       try {
         const appliedJobs = await interactionsAPI.getAppliedJobs(
-          pageNumber,
+          1,
           20
         );
         if (appliedJobs.success && appliedJobs.data) {
@@ -48,8 +52,22 @@ export default function HomePage() {
     fetchPreviousJobs();
   }, [user]);
 
-  const performSearch = async () => {
-
+  const handleQuickSearch =  async (searchQuery: string) => {
+    try {
+      const searchResults = await performQuickSearch(searchQuery);
+      if (searchResults) {
+        searchContext.updateSearchContext(
+          searchQuery,
+          null,
+          searchResults,
+        );
+        searchContext.updatePageNumber(2);
+        navigate("/jobs");
+      }
+    } catch (error) {
+      console.error("Search failed:", error);
+      // Optionally, you can show an error message to the user here
+    }
 
   }
 
@@ -89,7 +107,7 @@ export default function HomePage() {
         {/* Search Section */}
         <div className="flex flex-row justify-center items-center mb-12 sm:mb-14 lg:mb-16 w-full max-w-2xl">
           <div className="w-full border-2 border-gray-200 rounded-xl p-4 sm:p-6">
-            <Searchbar updateSearchTerm={() => {}}/>
+            <Searchbar searchOnEnter={handleQuickSearch}/>
           </div>
         </div>
 

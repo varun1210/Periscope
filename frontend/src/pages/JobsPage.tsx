@@ -1,29 +1,28 @@
 import { useState, useContext, useEffect } from "react";
-// import { Navigate } from "react-router-dom";
 
 import { jobsAPI } from "../api.ts";
 
 import Searchbar from "../components/Searchbar";
 import MultiSelectFilter from "../components/MultiSelectFilter";
 
+import performQuickSearch from "../utils/UtilFunctions.ts";
+
 import type { Job, JobSummary } from "../models/Job";
 import JobCard from "../components/JobCard";
 import JobPost from "../components/JobPost";
-import { UserContext } from "../utils/contexts";
+import { UserContext, SearchContext } from "../utils/contexts";
 
 export type Filters = {
-  locationFilter?: string[],
-  experienceFilter?: string[],
-  industryFilter?: string[],
-  resumeFilter?: string
-}
+  locationFilter?: string[];
+  experienceFilter?: string[];
+  industryFilter?: string[];
+  resumeFilter?: string;
+};
 
 export default function JobsPage() {
   const { user } = useContext(UserContext);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [jobSearchResults, setJobSearchResults] = useState<JobSummary[]>([]);
-  const [resultsCount, setResultsCount] = useState(0);
-  const [pageNumber, setPageNumber] = useState(1);
+  const searchContext = useContext(SearchContext);
+  const [searchTerm, setSearchTerm] = useState(searchContext.searchQuery || "");
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [showJobDetails, setShowJobDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,10 +39,52 @@ export default function JobsPage() {
     setResumeFilterOptions(user?.resumePaths || []);
   }, [user]);
 
+  useEffect(() => {
+    const updateFirstSelectedJob = async () => {
+      try {
+        if (!searchContext.searchResults) {
+          return;
+        }
+        if (searchContext.searchResults.total === 0) {
+          setSelectedJob(null);
+          return;
+        }
+        const firstJobDetails = await jobsAPI.getFullJobDetails(
+          searchContext.searchResults.jobs[0].job_id
+        );
+
+        if (!firstJobDetails.success || !firstJobDetails.data) {
+          console.error(
+            "Error fetching first job details:",
+            firstJobDetails.error
+          );
+          setSelectedJob(null);
+          return;
+        }
+        setSelectedJob({
+          jobId: firstJobDetails.data.job_id,
+          company: firstJobDetails.data.company,
+          title: firstJobDetails.data.title,
+          location: firstJobDetails.data.location,
+          jobDescription: firstJobDetails.data.job_description,
+          medianPay: firstJobDetails.data.median_pay,
+          minPay: firstJobDetails.data.min_pay,
+          maxPay: firstJobDetails.data.max_pay,
+          industry: firstJobDetails.data.industry,
+          experience: firstJobDetails.data.experience,
+          link: firstJobDetails.data.link,
+        });
+      } catch (error) {
+        console.log("Error loading first job", error);
+      }
+    };
+    updateFirstSelectedJob();
+  }, [searchContext.searchResults?.jobs[0]]);
+
   const applyFilter = (filterName: string, filterValues: string[]) => {
     setFilters((currentFilters) => {
-      const updateFilterValues = {...currentFilters}
-      if( filterName === "Location") {
+      const updateFilterValues = { ...currentFilters };
+      if (filterName === "Location") {
         updateFilterValues.locationFilter = filterValues;
       } else if (filterName === "Experience") {
         updateFilterValues.experienceFilter = filterValues;
@@ -54,6 +95,19 @@ export default function JobsPage() {
     });
   };
 
+  const handleQuickSearch = async (searchQuery: string) => {
+    try {
+      const searchResults = await performQuickSearch(searchQuery);
+      if (searchResults) {
+        searchContext.updateSearchContext(searchQuery, null, searchResults);
+        searchContext.updatePageNumber(2);
+      }
+    } catch (error) {
+      console.error("Search failed:", error);
+      // Optionally, you can show an error message to the user here
+    }
+  };
+
   const applyResumeFilter = (resumePath: string) => {
     setFilters((currentFilters) => {
       return { ...currentFilters, resumeFilter: resumePath };
@@ -62,55 +116,53 @@ export default function JobsPage() {
 
   const handleSearchTermChange = (input: string) => {
     setSearchTerm(input);
-  }
+  };
 
   const performSearch = async () => {
     setIsLoading(true);
+
     try {
       const response = await jobsAPI.searchJobs(searchTerm, filters, 1, 20);
-      
+
       if (!response.success || !response.data) {
         console.error("Error fetching jobs:", response.error);
-        setJobSearchResults([]);
+        searchContext.updateSearchContext(searchTerm, filters, null);
         setSelectedJob(null);
         return;
       }
-      console.log(response.data);
-      const jobs: JobSummary[] = response.data.jobs.map((job) => ({
-        jobId: job.job_id,
-        company: job.company,
-        title: job.title,
-        location: job.location,
-        medianPay: job.median_pay,
-        minPay: job.min_pay,
-        maxPay: job.max_pay,
-        link: job.link,
-      }));
 
-      if (jobs.length === 0) {
-        setSelectedJob(null);
+      if (response.data.total === 0) {
+        searchContext.updateSearchContext(searchTerm, filters, response.data);
         return;
       }
+
+      console.log(response.data);
 
       // Load first job details
-      const firstJobDetails = await jobsAPI.getFullJobDetails(jobs[0].jobId);
-      
+      const firstJobDetails = await jobsAPI.getFullJobDetails(
+        response.data.jobs[0].job_id
+      );
+
       if (!firstJobDetails.success || !firstJobDetails.data) {
-        console.error("Error fetching first job details:", firstJobDetails.error);
+        console.error(
+          "Error fetching first job details:",
+          firstJobDetails.error
+        );
         setSelectedJob(null);
         return;
       }
 
-      setJobSearchResults(jobs);
-      setResultsCount(response.data.total);
-      setPageNumber(2);
+      searchContext.updateSearchContext(searchTerm, filters, response.data);
+      searchContext.updatePageNumber(2);
+      // setPageNumber(2);
 
       setSelectedJob({
         jobId: firstJobDetails.data.job_id,
         title: firstJobDetails.data.title,
         company: firstJobDetails.data.company,
         location: firstJobDetails.data.location,
-        jobDescription: firstJobDetails.data.job_description || "Job details unavailable",
+        jobDescription:
+          firstJobDetails.data.job_description || "Job details unavailable",
         medianPay: firstJobDetails.data.median_pay,
         minPay: firstJobDetails.data.min_pay,
         maxPay: firstJobDetails.data.max_pay,
@@ -119,10 +171,9 @@ export default function JobsPage() {
         link: firstJobDetails.data.link,
       });
       setShowJobDetails(false);
-
     } catch (error) {
       console.error("Error performing search:", error);
-      setJobSearchResults([]);
+      // setJobSearchResults([]);
       setSelectedJob(null);
     } finally {
       setIsLoading(false);
@@ -130,29 +181,26 @@ export default function JobsPage() {
   };
 
   const loadMoreResults = async () => {
+    // console.log(pageNumber);
+    if(!searchContext.searchQuery) {
+      return;
+    }
     setIsLoading(true);
     try {
-      const response = await jobsAPI.searchJobs(searchTerm, filters, pageNumber, 20);
-      
+      const response = await jobsAPI.searchJobs(
+        searchContext.searchQuery,
+        searchContext.filters || undefined,
+        searchContext.pageNumber,
+        20
+      );
+
       if (!response.success || !response.data) {
         console.error("Error loading more results:", response.error);
         return;
       }
-
-      const newJobs: JobSummary[] = response.data.jobs.map((job) => ({
-        jobId: job.job_id,
-        company: job.company,
-        title: job.title,
-        location: job.location,
-        medianPay: job.median_pay,
-        minPay: job.min_pay,
-        maxPay: job.max_pay,
-        link: job.link,
-      }));
-
-      setJobSearchResults((currentJobs) => [...currentJobs, ...newJobs]);
-      setPageNumber((currentPageNumber) => currentPageNumber + 1);
-
+      searchContext.updateJobList(response.data);
+      searchContext.updatePageNumber(searchContext.pageNumber + 1);
+      // setPageNumber((currentPageNumber) => currentPageNumber + 1);
     } catch (error) {
       console.error("Error loading more results:", error);
     } finally {
@@ -164,7 +212,7 @@ export default function JobsPage() {
     setIsLoading(true);
     try {
       const response = await jobsAPI.getFullJobDetails(job.jobId);
-      
+
       if (!response.success || !response.data) {
         console.error("Error fetching job details:", response.error);
         setSelectedJob(null);
@@ -176,7 +224,8 @@ export default function JobsPage() {
         title: response.data.title,
         company: response.data.company,
         location: response.data.location,
-        jobDescription: response.data.job_description || "Job details unavailable",
+        jobDescription:
+          response.data.job_description || "Job details unavailable",
         medianPay: response.data.median_pay,
         minPay: response.data.min_pay,
         maxPay: response.data.max_pay,
@@ -185,7 +234,6 @@ export default function JobsPage() {
         link: response.data.link,
       });
       setShowJobDetails(true);
-
     } catch (error) {
       console.error("Error fetching job details:", error);
       setSelectedJob(null);
@@ -206,7 +254,11 @@ export default function JobsPage() {
           {/* Mobile Layout */}
           <div className="block lg:hidden space-y-4">
             <div>
-              <Searchbar updateSearchTerm={handleSearchTermChange} />
+              <Searchbar
+                parentSearchText={searchContext.searchQuery}
+                updateSearchTerm={handleSearchTermChange}
+                searchOnEnter={handleQuickSearch}
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <MultiSelectFilter
@@ -264,7 +316,11 @@ export default function JobsPage() {
           {/* Desktop Layout */}
           <div className="hidden lg:grid grid-cols-[3fr_1fr_1fr_1fr_1fr_auto] gap-4 items-center">
             <div>
-              <Searchbar updateSearchTerm={handleSearchTermChange} />
+              <Searchbar
+                parentSearchText={searchContext.searchQuery}
+                updateSearchTerm={handleSearchTermChange}
+                searchOnEnter={handleQuickSearch}
+              />
             </div>
             <div>
               <MultiSelectFilter
@@ -326,7 +382,7 @@ export default function JobsPage() {
 
         {/* Results Section */}
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
-          {jobSearchResults.length === 0 ? (
+          {searchContext.searchResults === null ? (
             <div className="flex-1 flex justify-center items-center min-h-96">
               <h1 className="text-xl text-gray-500 text-center">
                 Search for something to get started!
@@ -339,31 +395,37 @@ export default function JobsPage() {
                 {!showJobDetails ? (
                   <div className="space-y-4">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                      {resultsCount} Jobs Found
+                      {searchContext.searchResults.total} Jobs Found
                     </h2>
-                    <div className="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto">
-                      {jobSearchResults.map((job) => (
-                        <JobCard
-                          key={job.jobId}
-                          {...job}
-                          onClick={() => changeSelectedJob(job)}
-                          className={
-                            selectedJob?.jobId === job.jobId
-                              ? "ring-2 ring-green-500 border-green-500 bg-green-50"
-                              : ""
-                          }
-                        />
-                      ))}
-                      <div className="flex flex-row justify-center items-center py-4">
-                        <button
-                          className="text-green-800 text-sm hover:text-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                          onClick={loadMoreResults}
-                          disabled={isLoading}
-                        >
-                          {isLoading ? "Loading..." : "Load more"}
-                        </button>
+                    {searchContext.searchResults.total === 0 ? (
+                      <div className="text-lg font-medium text-gray-900 mb-2">
+                        No jobs found that match your query!
                       </div>
-                    </div>
+                    ) : (
+                      <div className="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto">
+                        {searchContext.fetchedJobs?.map((job) => (
+                          <JobCard
+                            key={job.jobId}
+                            {...job}
+                            onClick={() => changeSelectedJob(job)}
+                            className={
+                              selectedJob?.jobId === job.jobId
+                                ? "ring-2 ring-green-500 border-green-500 bg-green-50"
+                                : ""
+                            }
+                          />
+                        ))}
+                        <div className="flex flex-row justify-center items-center py-4">
+                          <button
+                            className="text-green-800 text-sm hover:text-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={loadMoreResults}
+                            disabled={isLoading}
+                          >
+                            {isLoading ? "Loading..." : "Load more"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -390,31 +452,37 @@ export default function JobsPage() {
                 {/* Job Cards Column */}
                 <div className="flex-1 flex flex-col h-[calc(100vh-180px)] bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                   <h2 className="text-lg font-semibold text-gray-900 mb-4 flex-shrink-0">
-                    {resultsCount} Jobs Found
+                    {searchContext.searchResults.total} Jobs Found
                   </h2>
-                  <div className="flex-1 overflow-y-auto pr-2 space-y-4">
-                    {jobSearchResults.map((job) => (
-                      <JobCard
-                        key={job.jobId}
-                        {...job}
-                        onClick={() => changeSelectedJob(job)}
-                        className={
-                          selectedJob?.jobId === job.jobId
-                            ? "ring-2 ring-green-500 border-green-500 bg-green-50"
-                            : ""
-                        }
-                      />
-                    ))}
-                    <div className="flex flex-row justify-center items-center py-4">
-                      <button
-                        className="text-green-800 text-sm hover:text-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        onClick={loadMoreResults}
-                        disabled={isLoading}
-                      >
-                        {isLoading ? "Loading..." : "Load more"}
-                      </button>
+                  {searchContext.searchResults.total === 0 ? (
+                    <div className="text-xl font-semibold text-gray-900 mb-3">
+                      No jobs found that match your query!
                     </div>
-                  </div>
+                  ) : (
+                    <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+                      {searchContext.fetchedJobs?.map((job) => (
+                        <JobCard
+                          key={job.jobId}
+                          {...job}
+                          onClick={() => changeSelectedJob(job)}
+                          className={
+                            selectedJob?.jobId === job.jobId
+                              ? "ring-2 ring-green-500 border-green-500 bg-green-50"
+                              : ""
+                          }
+                        />
+                      ))}
+                      <div className="flex flex-row justify-center items-center py-4">
+                        <button
+                          className="text-green-800 text-sm hover:text-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={loadMoreResults}
+                          disabled={isLoading}
+                        >
+                          {isLoading ? "Loading..." : "Load more"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Job Post Detail Column */}

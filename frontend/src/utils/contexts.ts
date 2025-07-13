@@ -25,9 +25,16 @@ export const UserContext = createContext<UserContextType>({
 export const SearchContext = createContext<SearchContextType>({
   searchQuery: null,
   filters: null,
-  results: null,
-  totalResults: null,
+  pageNumber: 1,
+  searchResults: null,
+  fetchedJobs: null,
   updateSearchContext: () => {
-    throw new Error("SearchContext must be used within SearchProvider");
+    throw new Error("SearchContext must be used within SearchProvider!");
   },
+  updateJobList: () => {
+    throw new Error("SearchContext must be used within SearchProvider!");
+  },
+  updatePageNumber: () => {
+    throw new Error("SearchContext must be used within SearchProvider!");
+  }
 });

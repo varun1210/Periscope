@@ -209,13 +209,12 @@ export const jobsAPI = {
   },
 
   searchJobs: async (
-    query_string: string,
+    queryString: string,
     filters: Filters = {},
     page: number = 1,
-    limit: number = 10
+    limit: number = 20
   ): Promise<ApiResponse<JobSearchResponse>> => {
     try {
-      console.log(filters)
       const requestFilters: FiltersRequest = {
         industry: filters.industryFilter?.length
           ? filters.industryFilter
@@ -229,7 +228,7 @@ export const jobsAPI = {
         resume: filters.resumeFilter || null,
       };
       const response = await api.post("jobs/search/", {
-        query_string,
+        query_string: queryString,
         filters: requestFilters,
         page,
         limit,

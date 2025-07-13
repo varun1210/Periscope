@@ -3,7 +3,7 @@ export interface Job {
   company: string,
   title: string,
   location: string,
-  jobDescription: string,
+  jobDescription: string | null,
   medianPay: number | null,
   minPay: number | null,
   maxPay: number | null,

@@ -69,6 +69,9 @@ async def search_jobs(
 ):
     """Search and filter jobs with pagination, excluding applied jobs"""
     try:
+        print(searchRequest)
+        print(current_user)
+
         query_string = searchRequest.query_string
         filters = searchRequest.filters
         page = searchRequest.page
@@ -128,7 +131,7 @@ async def search_jobs(
         jobs = query.order_by(Job.posted_date.desc()).offset((page - 1) * limit).limit(limit).all()
         # Calculate pagination info
         total_pages = math.ceil(total / limit)
-        
+        print(total)
         return JobSearchResponse(
             jobs=jobs,
             total=total,
